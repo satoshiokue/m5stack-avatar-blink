@@ -58,7 +58,7 @@ TaskResult_t facialLoop(void *args) {
   uint32_t blink_interval = 1000;
   unsigned long last_saccade_millis = 0;
   unsigned long last_blink_millis = 0;
-  bool eye_open = true;
+  int eye_open = 0;
   float vertical = 0.0f;
   float horizontal = 0.0f;
   float breath = 0.0f;
@@ -66,28 +66,53 @@ TaskResult_t facialLoop(void *args) {
   while (avatar->isDrawing()) {
 
     if ((lgfx::millis() - last_saccade_millis) > saccade_interval) {
-      vertical = _rand() / (RAND_MAX / 2.0) - 1;
-      horizontal = _rand() / (RAND_MAX / 2.0) - 1;
+      vertical = 0.8 * (_rand() / (RAND_MAX / 2.0) - 1);
+      horizontal = 0.8 * (_rand() / (RAND_MAX / 2.0) - 1);
       avatar->setGaze(vertical, horizontal);
-      saccade_interval = 500 + 100 * random(20);
+      saccade_interval = 800 + 100 * random(20);
       last_saccade_millis = lgfx::millis();
     }
 
     if ((lgfx::millis()- last_blink_millis) > blink_interval) {
-      if (eye_open) {
-        avatar->setEyeOpenRatio(1);
-        blink_interval = 2500 + 100 * random(20);
-      } else {
-        avatar->setEyeOpenRatio(0);
-        blink_interval = 300 + 10 * random(20);
-      }
-      eye_open = !eye_open;
-      last_blink_millis = lgfx::millis();
+		switch(eye_open) {
+			case 0:
+				avatar->setEyeOpenRatio(1);
+				blink_interval = 2500 + 100 * random(20);
+				break;
+			case 1:
+				avatar->setEyeOpenRatio(0.7);
+				blink_interval = 30;
+				break;
+			case 2:
+				avatar->setEyeOpenRatio(0);
+				blink_interval = 100;
+				break;
+			case 3:
+				avatar->setEyeOpenRatio(0.2);
+				blink_interval = 30;
+				break;
+			case 4:
+				avatar->setEyeOpenRatio(0.4);
+				blink_interval = 30;
+				break;
+			case 5:
+				avatar->setEyeOpenRatio(0.6);
+				blink_interval = 30;
+				break;
+			case 6:
+				avatar->setEyeOpenRatio(0.8);
+				blink_interval = 30;
+				break;
+		}
+		eye_open++;
+		if (eye_open > 6)
+			eye_open = 0;
+		last_blink_millis = lgfx::millis();
     }
     c = (c + 1) % 100;
     breath = sin(c * 2 * PI / 100.0);
     avatar->setBreath(breath);
-    TaskDelay(33);
+    TaskDelay(44);
   }
   TaskResult();
 }
@@ -100,7 +125,7 @@ Avatar::Avatar(Face *face)
       expression{Expression::Neutral},
       breath{0},
       eyeOpenRatio{1},
-      mouthOpenRatio{0},
+      mouthOpenRatio{0.1},
       gazeV{0},
       gazeH{0},
       rotation{0},

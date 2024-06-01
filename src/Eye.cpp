@@ -23,6 +23,8 @@ void Eye::draw(M5Canvas *spi, BoundingRect rect, DrawContext *ctx) {
 
   if (openRatio > 0) {
     spi->fillCircle(x + offsetX, y + offsetY, r, primaryColor);
+    if (exp != Expression::Happy)
+	  spi->fillRect(x + offsetX - r, y + offsetX - r -4, r * 2 + 4, (r * 2) * (1 - openRatio), backgroundColor);
     // TODO(meganetaaan): Refactor
     if (exp == Expression::Angry || exp == Expression::Sad) {
       int x0, y0, x1, y1, x2, y2;
@@ -47,11 +49,11 @@ void Eye::draw(M5Canvas *spi, BoundingRect rect, DrawContext *ctx) {
       spi->fillRect(x0, y0, w, h, backgroundColor);
     }
   } else {
-    int x1 = x - r + offsetX;
-    int y1 = y - 2 + offsetY;
-    int w = r * 2;
+    int x1 = x + offsetX - r;
+    int y1 = y + offsetY + r - (r/2);
+    int w = r;
     int h = 4;
-    spi->fillRect(x1, y1, w, h, primaryColor);
+    spi->fillRect(x1 + (w/2), y1, w, h, primaryColor);
   }
 }
 }  // namespace m5avatar
